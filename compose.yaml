@@ -5,6 +5,8 @@ services:
     restart: unless-stopped
     ports:
       - "2022:2022"   # SFTP
+      - "8080:8080"   # Panel de administración web (/web/admin)
+      - "10080:10080" # Portal WebClient para usuarios (/web/client)
     volumes:
       - ./data:/srv/sftpgo
       - ./config:/var/lib/sftpgo
