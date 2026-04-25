@@ -1,0 +1,16 @@
+services:
+  sftpgo:
+    container_name: sftpgo
+    image: drakkan/sftpgo:latest
+    restart: unless-stopped
+    ports:
+      - "2022:2022"   # SFTP
+    volumes:
+      - ./data:/srv/sftpgo
+      - ./config:/var/lib/sftpgo
+
+# añadir estas líneas al final del archivo para proxy inverso 
+networks:
+  default:
+    external: true
+    name: proxy
