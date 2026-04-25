@@ -2,13 +2,11 @@ services:
   sftpgo:
     container_name: sftpgo
     image: drakkan/sftpgo:latest
-    user: "1100:1100"
+    user: "1000:1000"
     restart: unless-stopped
-    environment:
-      - SFTPGO_DATA_PROVIDER__DRIVER=sqlite
-      - SFTPGO_DATA_PROVIDER__NAME=sftpgo.db
     ports:
       - "2022:2022" # SFTP
+      - "8080:8080" # Panel de administración
     volumes:
       - ./data:/srv/sftpgo
       - ./config:/var/lib/sftpgo

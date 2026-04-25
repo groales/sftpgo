@@ -7,7 +7,7 @@ Servidor de transferencia de archivos seguro con soporte para SFTP, FTP/S y WebD
 ## Caracteristicas
 
 - SFTP, FTP/S y WebDAV en un único contenedor
-- Panel de administración web (puerto 8080 interno)
+- Panel de administración web (puerto 8080 publicado)
 - Portal web para usuarios finales (webclient)
 - Autenticación 2FA
 - Carpetas virtuales y cuotas por usuario
@@ -19,8 +19,7 @@ Servidor de transferencia de archivos seguro con soporte para SFTP, FTP/S y WebD
 | Puerto | Protocolo | Descripcion |
 |--------|-----------|-------------|
 | 2022   | SFTP      | Transferencia de archivos (publicado directamente) |
-| 8080   | HTTP      | Panel web de administracion (interno para proxy, no publicado por defecto) |
-| 10080  | HTTP      | Portal WebClient (interno para proxy, no publicado por defecto) |
+| 8080   | HTTP      | Panel web de administracion (publicado directamente) |
 
 ## Requisitos Previos
 
@@ -46,11 +45,9 @@ services:
     image: drakkan/sftpgo:latest
     user: "1100:1100"
     restart: unless-stopped
-    environment:
-      - SFTPGO_DATA_PROVIDER__DRIVER=sqlite
-      - SFTPGO_DATA_PROVIDER__NAME=sftpgo.db
     ports:
       - "2022:2022" # SFTP
+      - "8080:8080" # Panel de administracion
     volumes:
       - ./data:/srv/sftpgo
       - ./config:/var/lib/sftpgo
@@ -102,12 +99,11 @@ docker compose logs -f sftpgo
 
 ## Primer acceso al panel de administracion
 
-Accede al panel web (temporalmente si no tienes proxy todavia):
+Accede al panel web:
 
-1. Publica el puerto 8080 añadiendo `"8080:8080"` en la sección `ports` del compose y haz `docker compose up -d`.
-2. Abre `http://IP_SERVIDOR:8080/web/admin`.
-3. Crea el primer usuario administrador.
-4. Retira el puerto 8080 del compose y configura el proxy inverso.
+1. Abre `http://IP_SERVIDOR:8080/web/admin`.
+2. Crea el primer usuario administrador.
+3. Opcional: configura proxy inverso y usa `https://sftpgo.tudominio.com/web/admin`.
 
 Con proxy inverso configurado accede directamente a `https://sftpgo.tudominio.com/web/admin`.
 
@@ -198,10 +194,7 @@ docker compose logs --tail 200 sftpgo
 
 ## Variables de entorno
 
-Variables definidas por defecto en el compose:
-
-- `SFTPGO_DATA_PROVIDER__DRIVER=sqlite`
-- `SFTPGO_DATA_PROVIDER__NAME=sftpgo.db`
+Este compose no define variables de entorno personalizadas. SFTPGo arranca con los valores por defecto de la imagen.
 
 La configuracion avanzada se realiza desde el panel web o montando un archivo de configuracion en `./config`.
 
