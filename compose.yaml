@@ -2,16 +2,18 @@ services:
   sftpgo:
     container_name: sftpgo
     image: drakkan/sftpgo:latest
+    user: "1100:1100"
     restart: unless-stopped
+    environment:
+      - SFTPGO_DATA_PROVIDER__DRIVER=sqlite
+      - SFTPGO_DATA_PROVIDER__NAME=sftpgo.db
     ports:
-      - "2022:2022"   # SFTP
-      - "8080:8080"   # Panel de administración web (/web/admin)
-      - "10080:10080" # Portal WebClient para usuarios (/web/client)
+      - "2022:2022" # SFTP
     volumes:
       - ./data:/srv/sftpgo
       - ./config:/var/lib/sftpgo
 
-# añadir estas líneas al final del archivo para proxy inverso 
+# Red externa para exponer panel/admin mediante proxy inverso
 networks:
   default:
     external: true

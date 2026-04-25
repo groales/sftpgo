@@ -19,8 +19,8 @@ Servidor de transferencia de archivos seguro con soporte para SFTP, FTP/S y WebD
 | Puerto | Protocolo | Descripcion |
 |--------|-----------|-------------|
 | 2022   | SFTP      | Transferencia de archivos (publicado directamente) |
-| 8080   | HTTP      | Panel web de administración (ruta a través de proxy) |
-| 10080  | HTTP      | Portal WebClient para usuarios (opcional, vía proxy) |
+| 8080   | HTTP      | Panel web de administracion (interno para proxy, no publicado por defecto) |
+| 10080  | HTTP      | Portal WebClient (interno para proxy, no publicado por defecto) |
 
 ## Requisitos Previos
 
@@ -44,14 +44,18 @@ services:
   sftpgo:
     container_name: sftpgo
     image: drakkan/sftpgo:latest
+    user: "1100:1100"
     restart: unless-stopped
+    environment:
+      - SFTPGO_DATA_PROVIDER__DRIVER=sqlite
+      - SFTPGO_DATA_PROVIDER__NAME=sftpgo.db
     ports:
-      - "2022:2022"   # SFTP
+      - "2022:2022" # SFTP
     volumes:
       - ./data:/srv/sftpgo
       - ./config:/var/lib/sftpgo
 
-# añadir estas líneas al final del archivo para proxy inverso 
+# Red externa para proxy inverso
 networks:
   default:
     external: true
@@ -77,11 +81,11 @@ cd sftpgo
 docker network create proxy
 ```
 
-3. Crea los directorios de datos y ajusta permisos (SFTPGo corre como UID/GID 1000):
+3. Crea los directorios de datos y ajusta permisos (este despliegue usa UID/GID 1100):
 
 ```bash
 mkdir -p data config
-chown -R 1000:1000 data config
+chown -R 1100:1100 data config
 ```
 
 4. Inicia el servicio:
@@ -158,7 +162,7 @@ Restauracion:
 docker compose down
 rm -rf data config
 tar -xzf backup/sftpgo-FECHA.tar.gz
-chown -R 1000:1000 data config
+chown -R 1100:1100 data config
 docker compose up -d
 ```
 
@@ -175,7 +179,7 @@ docker compose logs -f sftpgo
 Permisos denegados en arranque:
 
 ```bash
-chown -R 1000:1000 data config
+chown -R 1100:1100 data config
 ```
 
 No conecta por SFTP:
@@ -194,7 +198,12 @@ docker compose logs --tail 200 sftpgo
 
 ## Variables de entorno
 
-No hay variables de entorno requeridas en la configuracion actual. La configuracion avanzada se realiza desde el panel web o montando un archivo de configuracion en `./config`.
+Variables definidas por defecto en el compose:
+
+- `SFTPGO_DATA_PROVIDER__DRIVER=sqlite`
+- `SFTPGO_DATA_PROVIDER__NAME=sftpgo.db`
+
+La configuracion avanzada se realiza desde el panel web o montando un archivo de configuracion en `./config`.
 
 Consulta la referencia completa de variables en: [https://docs.sftpgo.com/latest/env-vars/](https://docs.sftpgo.com/latest/env-vars/)
 
