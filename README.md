@@ -43,7 +43,7 @@ services:
   sftpgo:
     container_name: sftpgo
     image: drakkan/sftpgo:latest
-    user: "1100:1100"
+    user: "1000:1000"
     restart: unless-stopped
     ports:
       - "2022:2022" # SFTP
@@ -78,11 +78,11 @@ cd sftpgo
 docker network create proxy
 ```
 
-3. Crea los directorios de datos y ajusta permisos (este despliegue usa UID/GID 1100):
+3. Crea los directorios de datos y ajusta permisos (este despliegue usa UID/GID 1000):
 
 ```bash
 mkdir -p data config
-chown -R 1100:1100 data config
+chown -R 1000:1000 data config
 ```
 
 4. Inicia el servicio:
@@ -158,7 +158,7 @@ Restauracion:
 docker compose down
 rm -rf data config
 tar -xzf backup/sftpgo-FECHA.tar.gz
-chown -R 1100:1100 data config
+chown -R 1000:1000 data config
 docker compose up -d
 ```
 
@@ -175,7 +175,7 @@ docker compose logs -f sftpgo
 Permisos denegados en arranque:
 
 ```bash
-chown -R 1100:1100 data config
+chown -R 1000:1000 data config
 ```
 
 No conecta por SFTP:
